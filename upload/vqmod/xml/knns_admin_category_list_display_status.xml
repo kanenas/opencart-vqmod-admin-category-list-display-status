@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<modification
+		xmlns="https://github.com/vqmod/vqmod"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://github.com/vqmod/vqmod https://raw.githubusercontent.com/vqmod/vqmod/master/vqmod.xsd"
+		>
+		<id><![CDATA[[VQMOD] Display status in admin's Category List]]></id>
+		<version>0.1.0</version>
+		<vqmver>2.6.8</vqmver>
+		<author>kanenas.net (aka Nikolas Branis) - nbran@kanenas.net</author>
+		<file path="admin/model/catalog/" name="category.php" error="log">
+			<operation error="skip">
+				<search position="replace"><![CDATA[$sql = "SELECT cp.category_id AS category_id, GROUP_CONCAT(cd1.name ORDER BY cp.level SEPARATOR '&nbsp;&nbsp;&gt;&nbsp;&nbsp;') AS name, c1.parent_id, c1.sort_order FROM " . DB_PREFIX . "category_path cp LEFT JOIN " . DB_PREFIX . "category c1 ON (cp.category_id = c1.category_id) LEFT JOIN " . DB_PREFIX . "category c2 ON (cp.path_id = c2.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd1 ON (cp.path_id = cd1.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd2 ON (cp.category_id = cd2.category_id) WHERE cd1.language_id = '" . (int)$this->config->get('config_language_id') . "' AND cd2.language_id = '" . (int)$this->config->get('config_language_id') . "'";]]></search>
+				<add><![CDATA[
+		// kanenas: knns_admin_category_list_display_status.xml (start) <<
+		$sql = "SELECT cp.category_id AS category_id, GROUP_CONCAT(cd1.name ORDER BY cp.level SEPARATOR '&nbsp;&nbsp;&gt;&nbsp;&nbsp;') AS name, c1.parent_id, c1.sort_order, c1.status FROM " . DB_PREFIX . "category_path cp LEFT JOIN " . DB_PREFIX . "category c1 ON (cp.category_id = c1.category_id) LEFT JOIN " . DB_PREFIX . "category c2 ON (cp.path_id = c2.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd1 ON (cp.path_id = cd1.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd2 ON (cp.category_id = cd2.category_id) WHERE cd1.language_id = '" . (int)$this->config->get('config_language_id') . "' AND cd2.language_id = '" . (int)$this->config->get('config_language_id') . "'";
+		// kanenas: knns_admin_category_list_display_status.xml (end) <<
+				]]></add>
+			</operation>
+		</file>
+		<file path="admin/controller/catalog/" name="category.php" error="log">
+			<operation error="skip">
+				<search position="after"><![CDATA[$data['text_confirm'] = $this->language->get('text_confirm');]]></search>
+				<add><![CDATA[
+		// kanenas: knns_admin_category_list_display_status.xml (start) <<
+		$data['entry_status'] = $this->language->get('entry_status');
+		$data['text_enabled'] = $this->language->get('text_enabled');
+		$data['text_disabled'] = $this->language->get('text_disabled');
+		// kanenas: knns_admin_category_list_display_status.xml (end) <<
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="before"><![CDATA['sort_order'  => $result['sort_order'],]]></search>
+				<add><![CDATA[
+				// kanenas: knns_admin_category_list_display_status.xml (start) <<
+				'status'  => $result['status'],
+				// kanenas: knns_admin_category_list_display_status.xml (end) <<
+				]]></add>
+			</operation>
+		</file>
+		<file path="admin/view/template/catalog/" name="category_list.tpl" error="log">
+			<operation error="skip">
+				<search position="after"><![CDATA[<td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>]]></search>
+				<add><![CDATA[
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (start) << ?>
+                  <td class="text-center">ID</td>
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (end) << ?>
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="before"><![CDATA[<td class="text-right"><?php if ($sort == 'sort_order') { ?>]]></search>
+				<add><![CDATA[
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (start) << ?>
+                  <td class="text-center"><?php echo $entry_status; ?></td>
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (end) << ?>
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="before"><![CDATA[<td class="text-left"><?php echo $category['name']; ?></td>]]></search>
+				<add><![CDATA[
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (start) << ?>
+                  <td class="text-center"><?php echo $category['category_id']; ?></td>
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (end) << ?>
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="after"><![CDATA[<td class="text-left"><?php echo $category['name']; ?></td>]]></search>
+				<add><![CDATA[
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (start) << ?>
+                  <td class="text-center">
+                    <?php
+                      if ((int) $category['status'] === 1 ) {
+                        echo $text_enabled;
+                      } else {
+                        echo $text_disabled;
+                      }
+                    ?>
+                  </td>
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (end) << ?>
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="replace"><![CDATA[<td class="text-center" colspan="4"><?php echo $text_no_results; ?></td>]]></search>
+				<add><![CDATA[
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (start) << ?>
+                  <td class="text-center" colspan="6"><?php echo $text_no_results; ?></td>
+                  <?php // kanenas: knns_admin_category_list_display_status.xml (end) << ?>
+				]]></add>
+			</operation>
+		</file>
+	</modification>
